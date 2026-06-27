@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>YouTube リモコン</title>
+  <link rel="stylesheet" href="style.css?v=1.1.0">
+  <!-- Google Fonts: Inter & Material Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+  
+  <!-- リモコンUI本体コンテナ -->
+  <div class="app-container" id="remote-app-container">
+    <!-- ステータスバー -->
+    <header class="status-bar">
+      <div class="connection-status">
+        <span class="status-dot warning" id="status-dot"></span>
+        <span class="status-text" id="status-text">PCを探しています...</span>
+      </div>
+      <div class="app-title">YT REMOTE</div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="main-content">
+      
+      <!-- === リモコンタブコンテンツ === -->
+      <div id="remote-tab-content" class="tab-content-pane">
+        <!-- 動画情報表示 -->
+        <section class="now-playing">
+          <div class="album-art">
+            <div class="art-placeholder" id="album-art-placeholder">
+              <span class="material-icons-round play-icon-watermark">play_arrow</span>
+            </div>
+            <img id="album-art-img" src="" alt="Thumbnail" class="hidden">
+          </div>
+          <div class="track-info">
+            <h2 class="track-title" id="video-title">動画が再生されていません</h2>
+            <p class="track-artist" id="channel-name">YouTube Player</p>
+          </div>
+        </section>
+
+        <!-- 進捗バー（シークバー） -->
+        <section class="progress-section">
+          <div class="time-display">
+            <span id="current-time">0:00</span>
+            <span id="total-time">0:00</span>
+          </div>
+          <div class="slider-container">
+            <input type="range" id="seek-slider" min="0" max="100" value="0" step="0.1" class="slider">
+            <div class="slider-progress" id="slider-progress"></div>
+          </div>
+        </section>
+
+        <!-- 主要コントロールボタン -->
+        <section class="controls-section">
+          <button class="btn secondary" id="prev-btn" title="前の動画">
+            <span class="material-icons-round">skip_previous</span>
+          </button>
+          
+          <button class="btn secondary" id="rewind-btn" title="10秒戻る">
+            <span class="material-icons-round">replay_10</span>
+          </button>
+          
+          <button class="btn primary" id="play-btn" title="再生 / 一時停止">
+            <span class="material-icons-round" id="play-icon">play_arrow</span>
+          </button>
+          
+          <button class="btn secondary" id="forward-btn" title="10秒進む">
+            <span class="material-icons-round">forward_10</span>
+          </button>
+          
+          <button class="btn secondary" id="next-btn" title="次の動画">
+            <span class="material-icons-round">skip_next</span>
+          </button>
+        </section>
+
+        <!-- ボリューム & ミュート & 再生速度 -->
+        <section class="volume-section">
+          <button class="volume-btn" id="mute-btn" title="ミュート">
+            <span class="material-icons-round" id="volume-icon">volume_up</span>
+          </button>
+          <div class="volume-slider-container">
+            <input type="range" id="volume-slider" min="0" max="100" value="100" class="slider">
+            <div class="volume-progress" id="volume-progress"></div>
+          </div>
+          
+          <!-- 再生速度セレクター -->
+          <div class="speed-selector">
+            <span class="material-icons-round speed-icon">speed</span>
+            <select id="speed-select" class="speed-select" title="再生速度">
+              <option value="0.25">0.25x</option>
+              <option value="0.5">0.5x</option>
+              <option value="0.75">0.75x</option>
+              <option value="1.0" selected>1.0x</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+              <option value="1.75">1.75x</option>
+              <option value="2.0">2.0x</option>
+            </select>
+          </div>
+        </section>
+      </div>
+
+      <!-- === 動画検索タブコンテンツ === -->
+      <div id="search-tab-content" class="tab-content-pane hidden">
+        <section class="search-section">
+          <div class="search-bar">
+            <input type="text" id="search-input" placeholder="YouTube動画を検索...">
+            <button id="search-submit-btn">
+              <span class="material-icons-round">search</span>
+            </button>
+          </div>
+          
+          <div class="search-results-container">
+            <div class="search-results" id="search-results-list">
+              <!-- プレースホルダー -->
+              <div class="search-placeholder" id="search-placeholder">
+                <span class="material-icons-round">youtube_searched_for</span>
+                <p>見たい動画を検索して<br>PCにキャストしましょう</p>
+              </div>
+              
+              <!-- ローダー（非表示） -->
+              <div class="search-loader hidden" id="search-loader">
+                <div class="spinner"></div>
+                <p>YouTubeを検索中...</p>
+              </div>
+              
+              <!-- 検索結果リストがここに動的に生成されます -->
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- === 再生キュータブコンテンツ === -->
+      <div id="queue-tab-content" class="tab-content-pane hidden">
+        <section class="queue-section">
+          <div class="queue-header">
+            <h3>再生キュー</h3>
+            <button id="clear-queue-btn" class="clear-btn">すべてクリア</button>
+          </div>
+          
+          <div class="queue-results-container">
+            <div class="queue-list" id="queue-list-container">
+              <!-- プレースホルダー -->
+              <div class="queue-placeholder" id="queue-placeholder">
+                <span class="material-icons-round">playlist_add</span>
+                <p>キューに動画がありません。<br>「動画検索」から追加してください。</p>
+              </div>
+              <!-- キューアイテムが動的に追加されます -->
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </main>
+
+    <!-- 下部ナビゲーションタブ -->
+    <nav class="nav-tabs">
+      <button class="nav-tab active" id="tab-remote-btn">
+        <span class="material-icons-round">settings_remote</span>
+        <span class="tab-label">リモコン</span>
+      </button>
+      <button class="nav-tab" id="tab-search-btn">
+        <span class="material-icons-round">search</span>
+        <span class="tab-label">動画検索</span>
+      </button>
+      <button class="nav-tab" id="tab-queue-btn">
+        <span class="material-icons-round">playlist_play</span>
+        <span class="tab-label">キュー</span>
+      </button>
+    </nav>
+
+    <!-- フッター -->
+    <footer>
+      <p id="peer-id-display">Peer ID: -----</p>
+    </footer>
+  </div>
+
+  <!-- 案内・説明ページコンテナ (ID未指定時に表示) -->
+  <div class="guide-container hidden" id="pairing-guide-container">
+    <div class="guide-card">
+      <header class="guide-header">
+        <div class="guide-logo-container">
+          <svg viewBox="0 0 24 24" width="48" height="48" fill="#ff3b30">
+            <path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.518 3.545 12 3.545 12 3.545s-7.518 0-9.388.507a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.87.507 9.388.507 9.388.507s7.518 0 9.388-.507a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+          </svg>
+        </div>
+        <h2>YouTube Remote</h2>
+        <p class="guide-subtitle">スマートフォン専用リモコン画面</p>
+      </header>
+      
+      <main class="guide-main">
+        <p class="guide-description">
+          このページは、PCのYouTubeをスマートフォンから遠隔操作できるブラウザ拡張機能<strong>「YouTube Remote Controller」</strong>の専用リモコンページです。
+        </p>
+        
+        <div class="guide-steps">
+          <div class="guide-step">
+            <span class="guide-step-num">1</span>
+            <div class="guide-step-text">
+              <h4>拡張機能をインストール</h4>
+              <p>PCのGoogle Chromeに「YouTube Remote Controller」拡張機能（デベロッパーモード）を読み込ませます。</p>
+            </div>
+          </div>
+          
+          <div class="guide-step">
+            <span class="guide-step-num">2</span>
+            <div class="guide-step-text">
+              <h4>YouTubeを開いてペアリングを表示</h4>
+              <p>PCでYouTubeを開き、拡張機能のアイコンをクリックして接続用のQRコードを表示します。</p>
+            </div>
+          </div>
+          
+          <div class="guide-step">
+            <span class="guide-step-num">3</span>
+            <div class="guide-step-text">
+              <h4>QRコードをスキャン</h4>
+              <p>スマートフォンのカメラでQRコードをスキャンすると、この画面が自動でリモコン画面に切り替わります。</p>
+            </div>
+          </div>
+        </div>
+      </main>
+      
+      <footer class="guide-footer">
+        <p>※ 本機能は個人使用目的でのみ動作します</p>
+      </footer>
+    </div>
+  </div>
+
+  <!-- PeerJS ライブラリ読み込み -->
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="remote.js?v=1.1.0"></script>
+</body>
+</html>
