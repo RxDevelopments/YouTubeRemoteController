@@ -339,9 +339,13 @@ document.addEventListener('DOMContentLoaded', () => {
       albumArtImg.src = '';
     }
 
-    // 再生速度の同期表示
-    if (state.playbackRate) {
-      speedSelect.value = state.playbackRate.toString();
+    // 再生速度の同期表示 (整数値は .0 を付与してHTMLのoption value値と完全一致させる)
+    if (state.playbackRate !== undefined) {
+      let rateStr = state.playbackRate.toString();
+      if (Number.isInteger(state.playbackRate)) {
+        rateStr = state.playbackRate.toFixed(1); // 1 -> "1.0", 2 -> "2.0"
+      }
+      speedSelect.value = rateStr;
     }
 
     // 再生・一時停止ボタン
