@@ -4,6 +4,8 @@ PCで開いているGoogle ChromeのYouTubeを、スマートフォンやタブ�
 
 PC側でNode.jsなどのサーバープログラム（ターミナル）を実行・起動しておく必要は一切なく、**完全サーバーレス（WebRTC P2P通信）**で動作します。
 
+※2026/06/29 追記  
+この拡張機能が[Chrome Webstore](https://chromewebstore.google.com/detail/youtube-remote-controller/jdkccoihfaeebmakcllhjbonifpiabmh)で公開されました。
 ---
 
 ## 主な機能特徴
